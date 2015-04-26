@@ -24,3 +24,9 @@ C:\Users\suame\Desktop\app stego\APLIKASI STEGO EDGE COVER CITRA DIGITAL\obj\x86
 C:\Users\suame\Desktop\app stego\APLIKASI STEGO EDGE COVER CITRA DIGITAL\obj\x86\Debug\APLIKASI STEGO EDGE COVER CITRA DIGITAL.csproj.GenerateResource.Cache
 C:\Users\suame\Documents\GitHub\App-Stego-Edge-Cover-Citra-Digital--using-piksel-\APLIKASI STEGO EDGE COVER CITRA DIGITAL\obj\x86\Debug\APLIKASI STEGO EDGE COVER CITRA DIGITAL.exe
 C:\Users\suame\Documents\GitHub\App-Stego-Edge-Cover-Citra-Digital--using-piksel-\APLIKASI STEGO EDGE COVER CITRA DIGITAL\obj\x86\Debug\APLIKASI STEGO EDGE COVER CITRA DIGITAL.pdb
+C:\Users\suame\Documents\GitHub\App-Stego-Edge-Cover-Citra-Digital--using-piksel-\APLIKASI STEGO EDGE COVER CITRA DIGITAL\bin\Debug\APLIKASI STEGO EDGE COVER CITRA DIGITAL.exe
+C:\Users\suame\Documents\GitHub\App-Stego-Edge-Cover-Citra-Digital--using-piksel-\APLIKASI STEGO EDGE COVER CITRA DIGITAL\bin\Debug\APLIKASI STEGO EDGE COVER CITRA DIGITAL.pdb
+C:\Users\suame\Documents\GitHub\App-Stego-Edge-Cover-Citra-Digital--using-piksel-\APLIKASI STEGO EDGE COVER CITRA DIGITAL\obj\x86\Debug\APLIKASI STEGO EDGE COVER CITRA DIGITAL.csprojResolveAssemblyReference.cache
+C:\Users\suame\Documents\GitHub\App-Stego-Edge-Cover-Citra-Digital--using-piksel-\APLIKASI STEGO EDGE COVER CITRA DIGITAL\obj\x86\Debug\APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL.Form1.resources
+C:\Users\suame\Documents\GitHub\App-Stego-Edge-Cover-Citra-Digital--using-piksel-\APLIKASI STEGO EDGE COVER CITRA DIGITAL\obj\x86\Debug\APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL.Properties.Resources.resources
+C:\Users\suame\Documents\GitHub\App-Stego-Edge-Cover-Citra-Digital--using-piksel-\APLIKASI STEGO EDGE COVER CITRA DIGITAL\obj\x86\Debug\APLIKASI STEGO EDGE COVER CITRA DIGITAL.csproj.GenerateResource.Cache

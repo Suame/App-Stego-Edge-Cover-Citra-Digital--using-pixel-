@@ -30,6 +30,7 @@
         {
             this.tabCtrlMenu = new System.Windows.Forms.TabControl();
             this.tabPageEmbed = new System.Windows.Forms.TabPage();
+            this.btnResetEmbed = new System.Windows.Forms.Button();
             this.pcBoxSave = new System.Windows.Forms.PictureBox();
             this.txtBoxStegoKey = new System.Windows.Forms.TextBox();
             this.lblStegoKey = new System.Windows.Forms.Label();
@@ -42,6 +43,7 @@
             this.pcboxEmbedStego = new System.Windows.Forms.PictureBox();
             this.pcboxCover = new System.Windows.Forms.PictureBox();
             this.tabPageExtract = new System.Windows.Forms.TabPage();
+            this.btnResetExtract = new System.Windows.Forms.Button();
             this.txtBoxKey = new System.Windows.Forms.TextBox();
             this.lblKey = new System.Windows.Forms.Label();
             this.txtBoxExtractMessage = new System.Windows.Forms.TextBox();
@@ -77,6 +79,7 @@
             // tabPageEmbed
             // 
             this.tabPageEmbed.BackColor = System.Drawing.Color.SeaShell;
+            this.tabPageEmbed.Controls.Add(this.btnResetEmbed);
             this.tabPageEmbed.Controls.Add(this.pcBoxSave);
             this.tabPageEmbed.Controls.Add(this.txtBoxStegoKey);
             this.tabPageEmbed.Controls.Add(this.lblStegoKey);
@@ -94,6 +97,20 @@
             this.tabPageEmbed.Size = new System.Drawing.Size(969, 608);
             this.tabPageEmbed.TabIndex = 0;
             this.tabPageEmbed.Text = "Embed";
+            // 
+            // btnResetEmbed
+            // 
+            this.btnResetEmbed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnResetEmbed.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnResetEmbed.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnResetEmbed.ForeColor = System.Drawing.Color.DarkRed;
+            this.btnResetEmbed.Location = new System.Drawing.Point(909, 8);
+            this.btnResetEmbed.Name = "btnResetEmbed";
+            this.btnResetEmbed.Size = new System.Drawing.Size(50, 25);
+            this.btnResetEmbed.TabIndex = 22;
+            this.btnResetEmbed.Text = "Reset";
+            this.btnResetEmbed.UseVisualStyleBackColor = true;
+            this.btnResetEmbed.Click += new System.EventHandler(this.btnResetEmbed_Click);
             // 
             // pcBoxSave
             // 
@@ -215,6 +232,7 @@
             // tabPageExtract
             // 
             this.tabPageExtract.BackColor = System.Drawing.Color.SeaShell;
+            this.tabPageExtract.Controls.Add(this.btnResetExtract);
             this.tabPageExtract.Controls.Add(this.txtBoxKey);
             this.tabPageExtract.Controls.Add(this.lblKey);
             this.tabPageExtract.Controls.Add(this.txtBoxExtractMessage);
@@ -229,6 +247,20 @@
             this.tabPageExtract.Size = new System.Drawing.Size(969, 608);
             this.tabPageExtract.TabIndex = 3;
             this.tabPageExtract.Text = "Extract";
+            // 
+            // btnResetExtract
+            // 
+            this.btnResetExtract.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnResetExtract.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnResetExtract.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnResetExtract.ForeColor = System.Drawing.Color.DarkRed;
+            this.btnResetExtract.Location = new System.Drawing.Point(910, 9);
+            this.btnResetExtract.Name = "btnResetExtract";
+            this.btnResetExtract.Size = new System.Drawing.Size(50, 25);
+            this.btnResetExtract.TabIndex = 21;
+            this.btnResetExtract.Text = "Reset";
+            this.btnResetExtract.UseVisualStyleBackColor = true;
+            this.btnResetExtract.Click += new System.EventHandler(this.btnResetExtract_Click);
             // 
             // txtBoxKey
             // 
@@ -364,6 +396,8 @@
         private System.Windows.Forms.TextBox txtBoxStegoKey;
         private System.Windows.Forms.Label lblStegoKey;
         private System.Windows.Forms.PictureBox pcBoxSave;
+        private System.Windows.Forms.Button btnResetExtract;
+        private System.Windows.Forms.Button btnResetEmbed;
     }
 }
 

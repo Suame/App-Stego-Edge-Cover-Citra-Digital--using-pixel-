@@ -22,8 +22,10 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             sfd = new SaveFileDialog();
         }
 
-        private float GetThreshold(Bitmap image, int n)
+        private float GetThreshold(Bitmap coverImage, int augmentedLength)
         {
+            Bitmap image = new Bitmap(coverImage);
+            int n = augmentedLength;
             float tMax = 255F, tMin = 0F, limit = 0.1F * n, tH, tL;
             int nE, diff;
             bool set = false;
@@ -53,14 +55,13 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             return tH;
         }
 
-        private Bitmap Embed(Bitmap image, string message, int p)
+        private Bitmap Embed(Bitmap coverImage, string secretMessage, int stegoKey)
         {
-            int l = message.Length;
-            Bitmap e;
-            float tH, tL;
-            Canny CannyData;
-            Bitmap stegoImage = (Bitmap)image.Clone();
-            string binaryMessage = StringToBinary(message);
+            Bitmap image = new Bitmap(coverImage);
+            string message = secretMessage;
+            int p = stegoKey;
+
+            Bitmap stegoImage = new Bitmap(image);
 
             //bitand
             for (int i = 0; i < image.Height; i++)
@@ -76,28 +77,30 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             //end bitand
 
             //add length of the message for C bits before the message
+            int l = message.Length;
             string binaryL = Convert.ToString(l, 2);
-            float C = (float)Math.Ceiling(binaryL.Length / 8F);
-            
-            string lengthMessage = Convert.ToString(l, 2).PadLeft((int)C * 8, '0');
+            int C = (int)Math.Ceiling(binaryL.Length / 8F);
+
+            string lengthMessage = Convert.ToString(l, 2).PadLeft(C * 8, '0');
+            string binaryMessage = StringToBinary(message);
             binaryMessage = lengthMessage + binaryMessage;
             l = binaryMessage.Length;   //length of the augmented message
 
             //l is the length of the binary digit from the message
             //l is divided by 2 because 1 pixel holds 2 bits of the message
-            tH = GetThreshold(image, (int)Math.Ceiling(l / 2F));
+            float tH = GetThreshold(image, (int)(l / 2));
             threshold = tH;
-            tL = 0.4F * tH;
+            float tL = 0.4F * tH;
 
             //obtain e: e is edge map obtained by calling canny edge detection algorithm
-            CannyData = new Canny(image, tH, tL);
-            e = CannyData.DisplayImage(CannyData.EdgeMap);
+            Canny CannyData = new Canny(image, tH, tL);
+            Bitmap e = CannyData.DisplayImage(CannyData.EdgeMap);
 
             //shuffle e and stegoImage using stego key P
-            randomPermute permute = new randomPermute(p);
-            randomPermute permute1 = new randomPermute(p);
-            e = permute.Encrypt(e);
-            stegoImage = permute1.Encrypt(stegoImage);
+            randomPermute permuteE = new randomPermute(p);
+            randomPermute permuteStego = new randomPermute(p);
+            e = permuteE.Encrypt(e);
+            stegoImage = permuteStego.Encrypt(stegoImage);
 
             //embed message
             int index = 0;
@@ -105,7 +108,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             {
                 for (int j = 0; j < e.Width; j++)
                 {
-                    int grey = (int)((e.GetPixel(j, i).R + e.GetPixel(j, i).G + e.GetPixel(j, i).B) / 3);
+                    byte grey = (byte)((e.GetPixel(j, i).R + e.GetPixel(j, i).G + e.GetPixel(j, i).B) / 3);
                     if (grey == 255 && index < l)
                     {
                         byte color = (byte)((stegoImage.GetPixel(j,i).R + stegoImage.GetPixel(j,i).G + stegoImage.GetPixel(j,i).B) / 3); ;
@@ -113,11 +116,11 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
                         if (index == l)
                         {
-                            color = (byte)(color + int.Parse(binaryMessage[index] + ""));
+                            color = (byte)(color + Convert.ToByte(binaryMessage[index] + ""));
                         }
                         else
                         {
-                            color = (byte)(color + (2 * int.Parse(binaryMessage[index + 1] + "")) + int.Parse(binaryMessage[index] + ""));
+                            color = (byte)(color + (2 * Convert.ToByte(binaryMessage[index + 1] + "")) + Convert.ToByte(binaryMessage[index] + ""));
                         }
 
                         Color newPixel = Color.FromArgb(color, color, color);
@@ -129,18 +132,18 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             //end embed message
 
             //reshuffle stegoImage to get stego image
-            stegoImage = permute1.Decrypt(stegoImage);
+            stegoImage = permuteStego.Decrypt(stegoImage);
 
             return stegoImage;
         }
-        
-        private string Extract(Bitmap image, float t, int p)
+
+        private string Extract(Bitmap StegoImage, float t, int stegoKey)
         {
-            Canny CannyData;
-            int edge;
-            Bitmap e;
-            Bitmap stegoImage = (Bitmap)image.Clone();
-            Bitmap mask = (Bitmap)stegoImage.Clone();
+            Bitmap image = new Bitmap(StegoImage);
+            int p = stegoKey;
+
+            Bitmap stegoImage = new Bitmap(image);
+            Bitmap mask = new Bitmap(stegoImage);
 
             //bitand
             for (int i = 0; i < mask.Height; i++)
@@ -154,17 +157,18 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 }
             }
             //end bitand
-            
-            float tH = t, tL = 0.4F * tH;
-            CannyData = new Canny(mask, tH, tL);
-            e = CannyData.DisplayImage(CannyData.EdgeMap);
-            edge = CannyData.CountEdges();
+
+            float tH = t;
+            float tL = 0.4F * tH;
+            Canny CannyData = new Canny(mask, tH, tL);
+            Bitmap e = CannyData.DisplayImage(CannyData.EdgeMap);
+            int edge = CannyData.CountEdges();
 
             //shuffle stegoImage to get order of embedding
-            randomPermute permute = new randomPermute(p);
-            randomPermute permute1 = new randomPermute(p);
-            e = permute.Encrypt(e);
-            stegoImage = permute1.Encrypt(stegoImage);
+            randomPermute permuteE = new randomPermute(p);
+            randomPermute permuteStego = new randomPermute(p);
+            e = permuteE.Encrypt(e);
+            stegoImage = permuteStego.Encrypt(stegoImage);
 
             //extract message
             string extractedMessage = "";
@@ -172,11 +176,10 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             {
                 for (int j = 0; j < e.Width; j++)
                 {
-                    int grey = (int)((e.GetPixel(j, i).R + e.GetPixel(j, i).G + e.GetPixel(j, i).B) / 3);
+                    byte grey = (byte)((e.GetPixel(j, i).R + e.GetPixel(j, i).G + e.GetPixel(j, i).B) / 3);
                     if (grey == 255)
                     {
-                        Color pixel = stegoImage.GetPixel(j, i);
-                        int x = (int)((pixel.R + pixel.G + pixel.B) / 3);
+                        byte x = (byte)((stegoImage.GetPixel(j, i).R + stegoImage.GetPixel(j, i).G + stegoImage.GetPixel(j, i).B) / 3);
                         byte value = (byte)(x & 3);
                         extractedMessage += (value % 2).ToString() + (value / 2).ToString();
                     }
@@ -187,10 +190,10 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             int c = (int)Math.Ceiling(binaryC.Length/8F);
 
             //extract first 16 bits to get length of the message
-            int l = Convert.ToInt32(extractedMessage.Substring(0, (int)c * 8), 2);
+            int l = Convert.ToInt32(extractedMessage.Substring(0, (c * 8)), 2);
             //extract the main message in binary
             //l * 8 because 1 string represents 8 bits
-            string binaryMessage = extractedMessage.Substring((int)c * 8, (l * 8));
+            string binaryMessage = extractedMessage.Substring((c * 8), (l * 8));
 
             return BinaryToString(binaryMessage);
         }
@@ -230,7 +233,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 {
                     PGMImageIO pgmImageIO = new PGMImageIO(ofd.FileName);
                     pgmImageIO.LoadImage();
-                    Bitmap _image = (Bitmap)pgmImageIO.Image.Clone();
+                    Bitmap _image = new Bitmap(pgmImageIO.Image);
                     pcboxCover.Image = _image;
                 }
                 else
@@ -241,7 +244,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
         private void btnEmbed_Click(object sender, EventArgs e)
         {
             string message = txtBoxEmbedMessage.Text;
-            Bitmap image = (Bitmap)pcboxCover.Image;
+            Bitmap image = new Bitmap(pcboxCover.Image);
             ALFG prng = new ALFG(11);
             int p = prng.PRNG(5, 7, 2);
 
@@ -253,7 +256,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
         private void pcBoxSave_Click(object sender, EventArgs e)
         {
-            Bitmap stegoImage = (Bitmap)pcboxEmbedStego.Image;
+            Bitmap stegoImage = new Bitmap(pcboxEmbedStego.Image);
             string p = txtBoxStegoKey.Text;
 
             sfd.FileName = "Stego Image " + p + ".png";
@@ -263,6 +266,14 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 stegoImage.Save(sfd.FileName, ImageFormat.Png);
             }
         }
+
+        private void btnResetEmbed_Click(object sender, EventArgs e)
+        {
+            txtBoxEmbedMessage.Text = "";
+            txtBoxStegoKey.Text = "";
+            pcboxCover.Image = null;
+            pcboxEmbedStego.Image = null;
+        } 
 
         private void pcBoxOpenStego_Click(object sender, EventArgs e)
         {
@@ -276,12 +287,19 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
         private void btnExtract_Click(object sender, EventArgs e)
         {            
-            Bitmap stegoImage = (Bitmap)pcBoxExtractStegoImage.Image;            
+            Bitmap stegoImage = new Bitmap(pcBoxExtractStegoImage.Image);            
             int p = Convert.ToInt32(txtBoxKey.Text);
             float tH = threshold;
 
             string extractedMessage = Extract(stegoImage, tH, p);
             txtBoxExtractMessage.Text = extractedMessage;
         }
+
+        private void btnResetExtract_Click(object sender, EventArgs e)
+        {
+            txtBoxKey.Text = "";
+            txtBoxExtractMessage.Text = "";
+            pcBoxExtractStegoImage.Image = null;
+        }            
     }
 }
