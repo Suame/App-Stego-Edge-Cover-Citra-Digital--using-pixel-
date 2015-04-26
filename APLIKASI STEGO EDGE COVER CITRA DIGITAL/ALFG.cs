@@ -7,7 +7,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 {
     class ALFG
     {
-        public int n;
+        int n;
         public ALFG(int n)
         {
             this.n = n;
@@ -26,6 +26,5 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             int Fibo = (fibo(n - j) + fibo(n - k)) % (int)Math.Pow(2,m);
             return Fibo;
         }
-
     }
 }

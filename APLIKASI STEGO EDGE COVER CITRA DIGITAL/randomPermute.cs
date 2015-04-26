@@ -10,15 +10,16 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 {
     public class randomPermute
     {
-        readonly int key;
+        int key;
 
         public randomPermute(int key)
         {
             this.key = key;
         }
 
-        public Bitmap Encrypt(Bitmap Image)
+        public Bitmap Encrypt(Bitmap image)
         {
+            Bitmap Image = new Bitmap(image);
             int height = Image.Height;
             int width = Image.Width;
             int piksel = width * height;
@@ -41,7 +42,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 rail[i] = new List<int>();
             }
 
-            // acak
+            // encrypt
             int number = 0;
             int increment = 1;
             for (int i = 0; i < temp.Length; i++)

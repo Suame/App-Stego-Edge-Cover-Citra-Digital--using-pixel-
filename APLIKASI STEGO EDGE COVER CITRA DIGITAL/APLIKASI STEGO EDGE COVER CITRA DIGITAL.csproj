@@ -49,6 +49,8 @@
   <ItemGroup>
     <Compile Include="ALFG.cs" />
     <Compile Include="Canny.cs" />
+    <Compile Include="Embed.cs" />
+    <Compile Include="Extract.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

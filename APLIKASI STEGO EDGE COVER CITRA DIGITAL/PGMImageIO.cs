@@ -47,9 +47,6 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
         /// </summary>
         public void LoadImage()
         {
-            int width;
-            int height;
-
             // Determine whether ASCII or BINARY PGM file - read 'Magic' number
             FileStream fin = new FileStream(_fileName, FileMode.Open);
 
@@ -66,13 +63,13 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
             // detect the type of PGM file ASCII or BINARY
             char iChar;
-
             if (Convert.ToChar(fin.ReadByte()) == '#')
             {
                 // skip the comment
                 do
+                {
                     iChar = Convert.ToChar(fin.ReadByte());
-                while (iChar != '\n');
+                } while (iChar != '\n');
             }
             else
             {
@@ -82,9 +79,12 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             // read in Width of image;
             for (int i = 0; i < 10; i++)
                 chReadIn[i] = '\0';
+
             do
+            {
                 iChar = Convert.ToChar(fin.ReadByte());
-            while ((iChar == '\n') || (iChar == ' '));
+            } while ((iChar == '\n') || (iChar == ' '));
+
             fin.Seek(-1, SeekOrigin.Current);
             for (int i = 0; i < 10; i++)
             {
@@ -93,16 +93,20 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 if ((chReadIn[i] == ' ') || (chReadIn[i] == '\n'))
                     break;
             }
+
             // conver char[] -> string -> int
             string szWidth = new string(chReadIn);
-            width = Convert.ToInt32(szWidth);
+            int width = Convert.ToInt32(szWidth);
 
             // read in Height of image;
             for (int i = 0; i < 10; i++)
                 chReadIn[i] = '\0';
+
             do
+            {
                 iChar = Convert.ToChar(fin.ReadByte());
-            while ((iChar == '\n') || (iChar == ' '));
+            } while ((iChar == '\n') || (iChar == ' '));
+
             fin.Seek(-1, SeekOrigin.Current);
             for (int i = 0; i < 10; i++)
             {
@@ -111,16 +115,19 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 if ((chReadIn[i] == ' ') || (chReadIn[i] == '\n'))
                     break;
             }
+
             // conver char[] -> string -> int
             string szHeight = new string(chReadIn);
-            height = Convert.ToInt32(szHeight);
+            int height = Convert.ToInt32(szHeight);
 
             // read in the max gray level
             for (int i = 0; i < 10; i++)
                 chReadIn[i] = '\0';
+
             do
+            {
                 iChar = Convert.ToChar(fin.ReadByte());
-            while ((iChar == '\n') || (iChar == ' '));
+            } while ((iChar == '\n') || (iChar == ' '));
             fin.Seek(-1, SeekOrigin.Current);
             for (int i = 0; i < 10; i++)
             {
@@ -132,6 +139,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             // conver char[] -> string -> int
             string szMaxGrayLevel = new string(chReadIn);
             int MaxGrayLevel = Convert.ToInt32(szMaxGrayLevel);
+
             if (MaxGrayLevel != 255)
             {
                 // only process 8 bits images
@@ -146,11 +154,8 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 // intialize dest image 24bits RBG Bitmap image
                 _image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
                 // lock dstImge data
-                BitmapData dstData = _image.LockBits(
-                    new Rectangle(0, 0, width, height),
-                    ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-                int dstOffset = dstData.Stride - 3 * width;
-
+                BitmapData dstData = _image.LockBits(new Rectangle(0, 0, width, height),
+                                     ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
                 // using unsafe code
                 unsafe
                 {
@@ -162,9 +167,12 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                             // read in image data pixel by pixel
                             for (int i = 0; i < 10; i++)
                                 chReadIn[i] = '\0';
+
                             do
+                            {
                                 iChar = Convert.ToChar(fin.ReadByte());
-                            while ((iChar == '\n') || (iChar == ' '));
+                            } while ((iChar == '\n') || (iChar == ' '));
+
                             fin.Seek(-1, SeekOrigin.Current);
                             for (int i = 0; i < 10; i++)
                             {
@@ -173,6 +181,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                                 if ((chReadIn[i] == ' ') || (chReadIn[i] == '\n'))
                                     break;
                             }
+
                             // conver char[] -> string -> int
                             string szPixelValue = new string(chReadIn);
                             byte intensity = Convert.ToByte(szPixelValue);
@@ -180,12 +189,12 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                             *(dst + 1) = *dst;
                             *(dst + 2) = *dst;
                         }
-                        dst += dstOffset;
+                        dst += dstData.Stride - 3 * width;
                     }
                 }
                 _image.UnlockBits(dstData);
-                // close file stream
-                fin.Close();
+
+                fin.Close();// close file stream
             }
             #endregion
 
@@ -197,10 +206,8 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 // read in image data
                 _image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
                 // lock dstImge data
-                BitmapData dstData = _image.LockBits(
-                    new Rectangle(0, 0, width, height),
-                    ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-                int dstOffset = dstData.Stride - 3 * width;
+                BitmapData dstData = _image.LockBits(new Rectangle(0, 0, width, height),
+                                     ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
                 // using unsafe code
                 unsafe
                 {
@@ -215,12 +222,12 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                             *(dst + 1) = *dst;
                             *(dst + 2) = *dst;
                         }
-                        dst += dstOffset;
+                        dst += dstData.Stride - 3 * width;
                     }
                 }
                 _image.UnlockBits(dstData);
-                // close file stream
-                fin.Close();
+
+                fin.Close();// close file stream
             }
             #endregion
 

@@ -27,6 +27,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 e -= 0x00800000; // Decrement exponent (1<<23)
                 m <<= 1; // Shift mantissa                
             }
+
             m &= unchecked((uint)~0x00800000); // Clear leading 1 bit
             e += 0x38800000; // Adjust bias ((127-14)<<23)
             return m | e; // Return combined number
@@ -40,6 +41,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             {
                 mantissaTable[i] = ConvertMantissa(i);
             }
+
             for (int i = 1024; i < 2048; i++)
             {
                 mantissaTable[i] = (uint)(0x38000000 + ((i - 1024) << 13));
@@ -47,6 +49,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
             return mantissaTable;
         }
+
         private static uint[] GenerateExponentTable()
         {
             uint[] exponentTable = new uint[64];
@@ -55,6 +58,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             {
                 exponentTable[i] = (uint)(i << 23);
             }
+
             exponentTable[31] = 0x47800000;
             exponentTable[32] = 0x80000000;
             for (int i = 33; i < 63; i++)
@@ -65,6 +69,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
             return exponentTable;
         }
+
         private static ushort[] GenerateOffsetTable()
         {
             ushort[] offsetTable = new ushort[64];
@@ -73,6 +78,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             {
                 offsetTable[i] = 1024;
             }
+
             offsetTable[32] = 0;
             for (int i = 33; i < 64; i++)
             {
@@ -81,6 +87,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
             return offsetTable;
         }
+
         private static ushort[] GenerateBaseTable()
         {
             ushort[] baseTable = new ushort[512];
@@ -116,6 +123,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
             return baseTable;
         }
+
         private static sbyte[] GenerateShiftTable()
         {
             sbyte[] shiftTable = new sbyte[512];
@@ -157,10 +165,10 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             uint result = mantissaTable[offsetTable[bits >> 10] + (bits & 0x3ff)] + exponentTable[bits >> 10];
             return *((float*)&result);
         }
+
         public static unsafe ushort FloatToHalf(float number)
         {
             uint value = *((uint*)&number);
-
             ushort result = (ushort)(baseTable[(value >> 23) & 0x1ff] + ((value & 0x007fffff) >> shiftTable[value >> 23]));
             return result;
         }
