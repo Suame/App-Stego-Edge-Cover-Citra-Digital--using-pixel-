@@ -19,6 +19,9 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             InitializeComponent();
             ofd = new OpenFileDialog();
             sfd = new SaveFileDialog();
+            pcBoxSave.Enabled = false;
+            btnEmbed.Enabled = false;
+            btnExtract.Enabled = false;
         }
                 
         public static string StringToBinary(string data)
@@ -42,7 +45,16 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             }
             return Encoding.ASCII.GetString(byteList.ToArray());
         }
-                            
+
+        private void txtBoxEmbedMessage_TextChanged(object sender, EventArgs e)
+        {
+            if (txtBoxEmbedMessage.Text != "" && pcboxCover.Image != null)
+                btnEmbed.Enabled = true;
+
+            if (txtBoxEmbedMessage.Text == "")
+                btnEmbed.Enabled = false;
+        }           
+
         private void pcBoxOpen_Click(object sender, EventArgs e)
         {
             ofd.FileName = "";
@@ -61,6 +73,9 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 }
                 else
                 pcboxCover.Image = new Bitmap(ofd.FileName);
+                
+                if (txtBoxEmbedMessage.Text != "" && pcboxCover.Image != null)
+                    btnEmbed.Enabled = true;
             }            
         }
 
@@ -68,13 +83,15 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
         {
             string message = txtBoxEmbedMessage.Text;
             Bitmap image = new Bitmap(pcboxCover.Image);
-            ALFG prng = new ALFG(31);
-            int p = prng.PRNG(17, 11, 23);
+            ALFG prng = new ALFG(11);
+            int p = prng.PRNG(7, 3, 23);
             Embed embed = new Embed();
             Bitmap stegoImage = embed.Embedding(image, message,p);
 
             txtBoxStegoKey.Text = p.ToString();
             pcboxEmbedStego.Image = stegoImage;
+
+            pcBoxSave.Enabled = true;
         }
 
         private void pcBoxSave_Click(object sender, EventArgs e)
@@ -96,7 +113,19 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             txtBoxStegoKey.Text = "";
             pcboxCover.Image = null;
             pcboxEmbedStego.Image = null;
-        } 
+            pcBoxSave.Enabled = false;
+            btnEmbed.Enabled = false;
+        }
+
+        private void txtBoxKey_TextChanged(object sender, EventArgs e)
+        {
+
+            if (txtBoxKey.Text != "" && pcBoxExtractStegoImage.Image != null)
+                btnExtract.Enabled = true;
+
+            if (txtBoxKey.Text == "")
+                btnExtract.Enabled = false;
+        }
 
         private void pcBoxOpenStego_Click(object sender, EventArgs e)
         {
@@ -105,6 +134,9 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 pcBoxExtractStegoImage.Image = new Bitmap(ofd.FileName);
+
+                if (txtBoxKey.Text != "" && pcBoxExtractStegoImage.Image != null)
+                    btnExtract.Enabled = true;
             } 
         }
 
@@ -122,6 +154,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             txtBoxKey.Text = "";
             txtBoxExtractMessage.Text = "";
             pcBoxExtractStegoImage.Image = null;
-        }            
+            btnExtract.Enabled = false;
+        }
     }
 }

@@ -178,6 +178,7 @@
             this.txtBoxEmbedMessage.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtBoxEmbedMessage.Size = new System.Drawing.Size(948, 99);
             this.txtBoxEmbedMessage.TabIndex = 6;
+            this.txtBoxEmbedMessage.TextChanged += new System.EventHandler(this.txtBoxEmbedMessage_TextChanged);
             // 
             // lblMessage
             // 
@@ -222,7 +223,7 @@
             // pcboxCover
             // 
             this.pcboxCover.BackColor = System.Drawing.Color.FloralWhite;
-            this.pcboxCover.Location = new System.Drawing.Point(21, 195);
+            this.pcboxCover.Location = new System.Drawing.Point(21, 192);
             this.pcboxCover.Name = "pcboxCover";
             this.pcboxCover.Size = new System.Drawing.Size(400, 400);
             this.pcboxCover.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -265,10 +266,10 @@
             // txtBoxKey
             // 
             this.txtBoxKey.Location = new System.Drawing.Point(20, 66);
-            this.txtBoxKey.Multiline = true;
             this.txtBoxKey.Name = "txtBoxKey";
-            this.txtBoxKey.Size = new System.Drawing.Size(131, 26);
+            this.txtBoxKey.Size = new System.Drawing.Size(131, 20);
             this.txtBoxKey.TabIndex = 17;
+            this.txtBoxKey.TextChanged += new System.EventHandler(this.txtBoxKey_TextChanged);
             // 
             // lblKey
             // 

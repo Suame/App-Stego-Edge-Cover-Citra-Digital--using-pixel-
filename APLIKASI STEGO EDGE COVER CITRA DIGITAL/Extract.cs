@@ -36,6 +36,14 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             Canny CannyDataMax = new Canny(mask, 0.1F, 0F);
             Bitmap eMax = new Bitmap(CannyDataMax.DisplayImage(CannyDataMax.EdgeMap));
 
+            //shuffle e and stegoImage using stego key P to embed tH and WoG in non-edge pixels of stegoImage
+            ALFG alfg = new ALFG(p);
+            int key = alfg.PRNG(13, 11, 13);
+            randomPermute permuteEMax = new randomPermute(key);
+            randomPermute permuteStegoImage = new randomPermute(key);
+            eMax = permuteEMax.Process(eMax, "Encrypt");
+            stegoImage = permuteStegoImage.Process(stegoImage, "Encrypt");
+
             //extract threshold and width of Gaussian from the non-edge pixels of stegoImage
             int index = 0;
             bool ex = false;
@@ -72,6 +80,9 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             }
             //end extract threshold and width of Gaussian
 
+            //reshuffle back stegoImage
+            stegoImage = permuteStegoImage.Process(stegoImage, "Decrypt");
+
             //convert threshold and width of Gaussian from the IEEE 754 floating point half precision format to float
             ushort halfTh = Convert.ToUInt16(binaryTh, 2);
             float tH = Half.HalfToFloat(halfTh);
@@ -84,8 +95,8 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             //shuffle stegoImage to get order of embedding
             randomPermute permuteE = new randomPermute(p);
             randomPermute permuteStego = new randomPermute(p);
-            e = permuteE.Encrypt(e);
-            stegoImage = permuteStego.Encrypt(stegoImage);
+            e = permuteE.Process(e, "Encrypt");
+            stegoImage = permuteStego.Process(stegoImage, "Encrypt");
 
             //extract message from the edge pixels of stegoImage
             string extractedMessage = "";

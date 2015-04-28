@@ -83,11 +83,11 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             Canny CannyData = new Canny(image, tH, tL);
             Bitmap e = CannyData.DisplayImage(CannyData.EdgeMap);
 
-            //shuffle e and stegoImage using stego key P
+            //shuffle e and stegoImage using stego key P to embed message in edge pixels of stegoImage
             randomPermute permuteE = new randomPermute(p);
             randomPermute permuteStego = new randomPermute(p);
-            e = permuteE.Encrypt(e);
-            stegoImage = permuteStego.Encrypt(stegoImage);
+            e = permuteE.Process(e, "Encrypt");
+            stegoImage = permuteStego.Process(stegoImage, "Encrypt");
 
             //embed message in edge pixels of stegoImage
             int index = 0;
@@ -101,14 +101,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                         byte x = (byte)((stegoImage.GetPixel(j, i).R + stegoImage.GetPixel(j, i).G + stegoImage.GetPixel(j, i).B) / 3); ;
                         x = (byte)(x & 252);
 
-                        if (index == l)
-                        {
-                            x = (byte)(x + Convert.ToByte(augmentedMessage[index] + ""));
-                        }
-                        else
-                        {
-                            x = (byte)(x + (2 * Convert.ToByte(augmentedMessage[index + 1] + "")) + Convert.ToByte(augmentedMessage[index] + ""));
-                        }
+                        x = (byte)(x + (2 * Convert.ToByte(augmentedMessage[index + 1] + "")) + Convert.ToByte(augmentedMessage[index] + ""));
 
                         Color newPixel = Color.FromArgb(x, x, x);
                         stegoImage.SetPixel(j, i, newPixel);
@@ -119,7 +112,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             //end embed message
 
             //reshuffle stegoImage to get stego image
-            stegoImage = permuteStego.Decrypt(stegoImage);
+            stegoImage = permuteStego.Process(stegoImage, "Decrypt");
 
             //convert threshold and width of Gaussian to IEEE 754 floating point half precision format
             ushort halfTh = Half.FloatToHalf(tH);
@@ -128,6 +121,14 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             //pixels in eMax are maximum number of edge pixels for a given image
             Canny CannyDataMax = new Canny(image, 0.1F, 0F);
             Bitmap eMax = new Bitmap(CannyDataMax.DisplayImage(CannyDataMax.EdgeMap));
+
+            //shuffle e and stegoImage using stego key P to embed tH and WoG in non-edge pixels of stegoImage
+            ALFG alfg = new ALFG(p);
+            int key = alfg.PRNG(13, 11, 13);
+            randomPermute permuteEMax = new randomPermute(key);
+            randomPermute permuteStegoImage = new randomPermute(key);
+            eMax = permuteEMax.Process(eMax, "Encrypt");
+            stegoImage = permuteStegoImage.Process(stegoImage, "Encrypt");
 
             //embed threshold and width of Gaussian in non-edge pixels of stegoImage
             index = 0;
@@ -145,6 +146,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                             x = (byte)(x & 254);
 
                             x = (byte)(x + Convert.ToByte(binaryTh[index] + ""));
+
                             Color newPixel = Color.FromArgb(x, x, x);
                             stegoImage.SetPixel(j, i, newPixel);
                             index++;
@@ -155,6 +157,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                             x = (byte)(x & 254);
 
                             //x = (byte)(x + Convert.ToByte(binaryWoG[index] + ""));
+
                             Color newPixel = Color.FromArgb(x, x, x);
                             stegoImage.SetPixel(j, i, newPixel);
                             index++;
@@ -169,6 +172,9 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 if (ex == true)
                     break;
             }
+
+            //reshuffle stegoImage to get stego image
+            stegoImage = permuteStegoImage.Process(stegoImage, "Decrypt");
 
             return stegoImage;
         }
