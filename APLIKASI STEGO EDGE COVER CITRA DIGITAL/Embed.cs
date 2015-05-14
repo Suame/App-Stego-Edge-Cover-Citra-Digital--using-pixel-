@@ -12,10 +12,11 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 {
     class Embed
     {
-        private float GetThreshold(Bitmap coverImage, int augmentedLength)
+        private float GetThreshold(Bitmap coverImage, int augmentedLength, float widthOfGaussian)
         {
             Bitmap image = new Bitmap(coverImage);
             int n = augmentedLength;
+            float sigma = widthOfGaussian;
             float tMax = 255F, tMin = 0F, limit = 0.1F * n, tH, tL;
             int nE, diff;
             bool set = false;
@@ -24,7 +25,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             {
                 tH = (float)Math.Floor((tMax + tMin) / 2F);
                 tL = 0.4F * tH;
-                Canny CannyData = new Canny(image, tH, tL);
+                Canny CannyData = new Canny(image, tH, tL, sigma);
                 nE = CannyData.CountEdges();
                 diff = nE - n;
 
@@ -45,11 +46,12 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             return tH;
         }
 
-        public Bitmap Embedding(Bitmap coverImage, string secretMessage, int stegoKey)
+        public Bitmap Embedding(Bitmap coverImage, string secretMessage, int stegoKey, float widthOfGaussian)
         {
             Bitmap image = new Bitmap(coverImage);
             string message = secretMessage;
             int p = stegoKey;
+            float WoG = widthOfGaussian;
 
             Bitmap stegoImage = new Bitmap(image);
 
@@ -76,11 +78,11 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             l = augmentedMessage.Length;   //length of the augmented message in binary
 
             //l is divided by 2 because each edge pixel carries 2 bits of the augmented message
-            float tH = GetThreshold(image, (int)(l / 2));
+            float tH = GetThreshold(image, (int)(l / 2), WoG);
             float tL = 0.4F * tH;
 
             //obtain e: e is edge map obtained by calling canny edge detection algorithm
-            Canny CannyData = new Canny(image, tH, tL);
+            Canny CannyData = new Canny(image, tH, tL, WoG);
             Bitmap e = CannyData.DisplayImage(CannyData.EdgeMap);
 
             //shuffle e and stegoImage using stego key P to embed message in edge pixels of stegoImage
@@ -117,9 +119,11 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             //convert threshold and width of Gaussian to IEEE 754 floating point half precision format
             ushort halfTh = Half.FloatToHalf(tH);
             string binaryTh = Convert.ToString(halfTh, 2).PadLeft(16, '0');
-
+            ushort halfWoG = Half.FloatToHalf(WoG);
+            string binaryWoG = Convert.ToString(halfWoG, 2).PadLeft(16, '0');
+            
             //pixels in eMax are maximum number of edge pixels for a given image
-            Canny CannyDataMax = new Canny(image, 0.1F, 0F);
+            Canny CannyDataMax = new Canny(image, 0.1F, 0F, 0.1F);
             Bitmap eMax = new Bitmap(CannyDataMax.DisplayImage(CannyDataMax.EdgeMap));
 
             //shuffle e and stegoImage using stego key P to embed tH and WoG in non-edge pixels of stegoImage
@@ -156,7 +160,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                             byte x = (byte)((stegoImage.GetPixel(j, i).R + stegoImage.GetPixel(j, i).G + stegoImage.GetPixel(j, i).B) / 3);
                             x = (byte)(x & 254);
 
-                            //x = (byte)(x + Convert.ToByte(binaryWoG[index] + ""));
+                            x = (byte)(x + Convert.ToByte(binaryWoG[index - 16] + ""));
 
                             Color newPixel = Color.FromArgb(x, x, x);
                             stegoImage.SetPixel(j, i, newPixel);

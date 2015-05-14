@@ -4,6 +4,7 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows.Forms;
 
 namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 {
@@ -143,7 +144,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             if (MaxGrayLevel != 255)
             {
                 // only process 8 bits images
-                throw new ApplicationException("PGMImageIO::LoadImage(), Can't now handle less than 8 bits images");
+                MessageBox.Show("PGMImageIO::LoadImage(), Can't now handle less than 8 bits images");
             }
 
             #region P2
@@ -234,9 +235,60 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             else
             {
                 // not valid PGM file
-                throw new ApplicationException("PGMImageIO::LoadImage(), Not valid PGM file");
+                MessageBox.Show("PGMImageIO::LoadImage(), Not valid PGM file");
             }
         } // LoadImage()
+
+        public void SaveImage()
+        {
+            // save PGM file
+            // P5 BINARY TYPE
+            FileStream fout = new FileStream(_fileName, FileMode.Create);
+
+            // Write in magic number P5
+            byte[] bMagicNumber = new UTF8Encoding(true).GetBytes("P5\n");
+            fout.Write(bMagicNumber, 0, bMagicNumber.Length);
+
+            // Write Width
+            string szWidth = _image.Width.ToString();
+            szWidth += "\n";
+            byte[] bWidth = new UTF8Encoding(true).GetBytes(szWidth);
+            fout.Write(bWidth, 0, bWidth.Length);
+
+            // Write Height
+            string szHeight = _image.Height.ToString();
+            szHeight += "\n";
+            byte[] bHeight = new UTF8Encoding(true).GetBytes(szHeight);
+            fout.Write(bHeight, 0, bHeight.Length);
+
+            // Write bits of per pixel
+            // default 255, 8 bits per pixel
+            string szBitsPerPixel = "255\n";
+            byte[] bBitsPerPixel = new UTF8Encoding(true).GetBytes(szBitsPerPixel);
+            fout.Write(bBitsPerPixel, 0, bBitsPerPixel.Length);
+
+            // Write pixel intensities
+            BitmapData dstData = _image.LockBits(new Rectangle(0, 0, _image.Width, _image.Height),
+                                                 ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+            // using unsafe code
+            unsafe
+            {
+                byte* dst = (byte*)dstData.Scan0.ToPointer();
+
+                for (int y = 0; y < _image.Height; y++)
+                {
+                    for (int x = 0; x < _image.Width; x++, dst += 3)
+                    {
+                        // write image data pixel by pixel
+                        fout.WriteByte(Convert.ToByte(*dst));
+                    }
+                    dst += dstData.Stride - 3 * _image.Width;
+                }
+            }
+            _image.UnlockBits(dstData);
+            fout.Close();
+        } // SaveImage() 
         #endregion
     }
 }

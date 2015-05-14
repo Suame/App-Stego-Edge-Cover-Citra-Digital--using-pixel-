@@ -52,6 +52,8 @@
             this.lblStegoIm = new System.Windows.Forms.Label();
             this.pcBoxExtractStegoImage = new System.Windows.Forms.PictureBox();
             this.pcBoxOpenStego = new System.Windows.Forms.PictureBox();
+            this.lblGaussian = new System.Windows.Forms.Label();
+            this.numericUpDownGaussian = new System.Windows.Forms.NumericUpDown();
             this.tabCtrlMenu.SuspendLayout();
             this.tabPageEmbed.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pcBoxSave)).BeginInit();
@@ -61,6 +63,7 @@
             this.tabPageExtract.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pcBoxExtractStegoImage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pcBoxOpenStego)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownGaussian)).BeginInit();
             this.SuspendLayout();
             // 
             // tabCtrlMenu
@@ -73,12 +76,14 @@
             this.tabCtrlMenu.Location = new System.Drawing.Point(0, 0);
             this.tabCtrlMenu.Name = "tabCtrlMenu";
             this.tabCtrlMenu.SelectedIndex = 0;
-            this.tabCtrlMenu.Size = new System.Drawing.Size(977, 634);
+            this.tabCtrlMenu.Size = new System.Drawing.Size(977, 640);
             this.tabCtrlMenu.TabIndex = 5;
             // 
             // tabPageEmbed
             // 
             this.tabPageEmbed.BackColor = System.Drawing.Color.SeaShell;
+            this.tabPageEmbed.Controls.Add(this.numericUpDownGaussian);
+            this.tabPageEmbed.Controls.Add(this.lblGaussian);
             this.tabPageEmbed.Controls.Add(this.btnResetEmbed);
             this.tabPageEmbed.Controls.Add(this.pcBoxSave);
             this.tabPageEmbed.Controls.Add(this.txtBoxStegoKey);
@@ -94,7 +99,7 @@
             this.tabPageEmbed.Location = new System.Drawing.Point(4, 22);
             this.tabPageEmbed.Name = "tabPageEmbed";
             this.tabPageEmbed.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageEmbed.Size = new System.Drawing.Size(969, 608);
+            this.tabPageEmbed.Size = new System.Drawing.Size(969, 614);
             this.tabPageEmbed.TabIndex = 0;
             this.tabPageEmbed.Text = "Embed";
             // 
@@ -223,7 +228,7 @@
             // pcboxCover
             // 
             this.pcboxCover.BackColor = System.Drawing.Color.FloralWhite;
-            this.pcboxCover.Location = new System.Drawing.Point(21, 192);
+            this.pcboxCover.Location = new System.Drawing.Point(22, 195);
             this.pcboxCover.Name = "pcboxCover";
             this.pcboxCover.Size = new System.Drawing.Size(400, 400);
             this.pcboxCover.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -245,7 +250,7 @@
             this.tabPageExtract.Location = new System.Drawing.Point(4, 22);
             this.tabPageExtract.Name = "tabPageExtract";
             this.tabPageExtract.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageExtract.Size = new System.Drawing.Size(969, 608);
+            this.tabPageExtract.Size = new System.Drawing.Size(969, 614);
             this.tabPageExtract.TabIndex = 3;
             this.tabPageExtract.Text = "Extract";
             // 
@@ -270,6 +275,7 @@
             this.txtBoxKey.Size = new System.Drawing.Size(131, 20);
             this.txtBoxKey.TabIndex = 17;
             this.txtBoxKey.TextChanged += new System.EventHandler(this.txtBoxKey_TextChanged);
+            this.txtBoxKey.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtBoxKey_KeyPress);
             // 
             // lblKey
             // 
@@ -292,7 +298,7 @@
             this.txtBoxExtractMessage.Name = "txtBoxExtractMessage";
             this.txtBoxExtractMessage.ReadOnly = true;
             this.txtBoxExtractMessage.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtBoxExtractMessage.Size = new System.Drawing.Size(400, 519);
+            this.txtBoxExtractMessage.Size = new System.Drawing.Size(400, 530);
             this.txtBoxExtractMessage.TabIndex = 14;
             // 
             // btnExtract
@@ -349,11 +355,50 @@
             this.pcBoxOpenStego.TabStop = false;
             this.pcBoxOpenStego.Click += new System.EventHandler(this.pcBoxOpenStego_Click);
             // 
+            // lblGaussian
+            // 
+            this.lblGaussian.AutoSize = true;
+            this.lblGaussian.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblGaussian.Location = new System.Drawing.Point(202, 170);
+            this.lblGaussian.Name = "lblGaussian";
+            this.lblGaussian.Size = new System.Drawing.Size(145, 16);
+            this.lblGaussian.TabIndex = 24;
+            this.lblGaussian.Text = "Width of Gaussian : ";
+            // 
+            // numericUpDownGaussian
+            // 
+            this.numericUpDownGaussian.DecimalPlaces = 1;
+            this.numericUpDownGaussian.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numericUpDownGaussian.Location = new System.Drawing.Point(343, 168);
+            this.numericUpDownGaussian.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownGaussian.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numericUpDownGaussian.Name = "numericUpDownGaussian";
+            this.numericUpDownGaussian.Size = new System.Drawing.Size(79, 20);
+            this.numericUpDownGaussian.TabIndex = 25;
+            this.numericUpDownGaussian.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.numericUpDownGaussian.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(976, 633);
+            this.ClientSize = new System.Drawing.Size(976, 639);
             this.Controls.Add(this.tabCtrlMenu);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "Form1";
@@ -369,6 +414,7 @@
             this.tabPageExtract.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pcBoxExtractStegoImage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pcBoxOpenStego)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownGaussian)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -399,6 +445,8 @@
         private System.Windows.Forms.PictureBox pcBoxSave;
         private System.Windows.Forms.Button btnResetExtract;
         private System.Windows.Forms.Button btnResetEmbed;
+        private System.Windows.Forms.NumericUpDown numericUpDownGaussian;
+        private System.Windows.Forms.Label lblGaussian;
     }
 }
 

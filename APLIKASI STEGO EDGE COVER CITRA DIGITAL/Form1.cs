@@ -57,59 +57,97 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
         private void pcBoxOpen_Click(object sender, EventArgs e)
         {
-            ofd.FileName = "";
-            ofd.Filter = "File Gambar(*.png,*.bmp,*.pgm)|*.png;*.bmp;*.pgm";
-            if (ofd.ShowDialog() == DialogResult.OK)
+            try
             {
-                string extension = Path.GetExtension(ofd.FileName);
-                extension = extension.ToLower();
-
-                if (extension == ".pgm")
+                ofd.FileName = "";
+                ofd.Filter = "File Gambar(*.pgm;*.png;*.bmp;*.jpg;*.jpeg)|*.pgm;*.png;*.bmp;*.jpg;*.jpeg";
+                if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    PGMImageIO pgmImageIO = new PGMImageIO(ofd.FileName);
-                    pgmImageIO.LoadImage();
-                    Bitmap _image = new Bitmap(pgmImageIO.Image);
-                    pcboxCover.Image = _image;
+                    string extension = Path.GetExtension(ofd.FileName);
+                    extension = extension.ToLower();
+
+                    if (extension == ".pgm")
+                    {
+                        PGMImageIO pgmImageIO = new PGMImageIO(ofd.FileName);
+                        pgmImageIO.LoadImage();
+                        Bitmap _image = new Bitmap(pgmImageIO.Image);
+                        pcboxCover.Image = _image;
+                    }
+                    else
+                        pcboxCover.Image = new Bitmap(ofd.FileName);
+
+                    if (txtBoxEmbedMessage.Text != "" && pcboxCover.Image != null)
+                        btnEmbed.Enabled = true;
                 }
-                else
-                pcboxCover.Image = new Bitmap(ofd.FileName);
-                
-                if (txtBoxEmbedMessage.Text != "" && pcboxCover.Image != null)
-                    btnEmbed.Enabled = true;
-            }            
+            }
+            catch (Exception er)
+            {
+                MessageBox.Show("Failed to load image, " + er.Message);
+            }
         }
 
         private void btnEmbed_Click(object sender, EventArgs e)
         {
-            string message = txtBoxEmbedMessage.Text;
-            Bitmap image = new Bitmap(pcboxCover.Image);
-            ALFG prng = new ALFG(11);
-            int p = prng.PRNG(7, 3, 23);
-            Embed embed = new Embed();
-            Bitmap stegoImage = embed.Embedding(image, message,p);
+            try
+            {
+                string message = txtBoxEmbedMessage.Text;
+                float widthOfGaussian = (float)numericUpDownGaussian.Value;
+                Bitmap image = new Bitmap(pcboxCover.Image);
+                ALFG prng = new ALFG(11);
+                int p = prng.PRNG(7, 3, 23);
+                Embed embed = new Embed();
+                Bitmap stegoImage = embed.Embedding(image, message, p, widthOfGaussian);
 
-            txtBoxStegoKey.Text = p.ToString();
-            pcboxEmbedStego.Image = stegoImage;
+                txtBoxStegoKey.Text = p.ToString();
+                pcboxEmbedStego.Image = stegoImage;
 
-            pcBoxSave.Enabled = true;
+                pcBoxSave.Enabled = true;
+            }
+            catch (Exception er)
+            {
+                MessageBox.Show("Failed to embed secret message in cover image : \n" + er.Message);
+            }
         }
 
         private void pcBoxSave_Click(object sender, EventArgs e)
         {
-            Bitmap stegoImage = new Bitmap(pcboxEmbedStego.Image);
-            string p = txtBoxStegoKey.Text;
+            try
+            {
+                Bitmap stegoImage = new Bitmap(pcboxEmbedStego.Image);
+                string p = txtBoxStegoKey.Text;
 
-            sfd.FileName = "Stego Image " + p + ".png";
-            sfd.Filter = "File Gambar(*.png)|*.png";
-            if (sfd.ShowDialog() == DialogResult.OK)
-            {                
-                stegoImage.Save(sfd.FileName, ImageFormat.Png);
+                sfd.FileName = "Stego Image " + p;
+                sfd.Filter = "PGM(*.pgm)|*.pgm|PNG(*.png)|*.png|BMP(*.bmp)|*.bmp|JPEG(*.jpg,*.jpeg)|*.jpeg";
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    string extension = Path.GetExtension(sfd.FileName);
+                    extension = extension.ToLower();
+
+                    if (extension == ".pgm")
+                    {
+                        PGMImageIO pgmImageIO = new PGMImageIO(sfd.FileName, stegoImage);
+                        pgmImageIO.SaveImage();
+                    }
+                    else if (extension == ".png")
+                        stegoImage.Save(sfd.FileName, ImageFormat.Png);
+                    else if (extension == ".bmp")
+                        stegoImage.Save(sfd.FileName, ImageFormat.Bmp);
+                    else if (extension == ".jpeg")
+                        stegoImage.Save(sfd.FileName, ImageFormat.Jpeg);
+                    else
+                        MessageBox.Show("Unsupported image format");
+                }
+            }
+            catch (Exception er)
+            {
+                MessageBox.Show("Failed to save image : \n" + er.Message);
             }
         }
 
         private void btnResetEmbed_Click(object sender, EventArgs e)
         {
             txtBoxEmbedMessage.Text = "";
+            numericUpDownGaussian.Value = (decimal)0.1;
             txtBoxStegoKey.Text = "";
             pcboxCover.Image = null;
             pcboxEmbedStego.Image = null;
@@ -119,7 +157,6 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
         private void txtBoxKey_TextChanged(object sender, EventArgs e)
         {
-
             if (txtBoxKey.Text != "" && pcBoxExtractStegoImage.Image != null)
                 btnExtract.Enabled = true;
 
@@ -127,26 +164,59 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                 btnExtract.Enabled = false;
         }
 
+        private void txtBoxKey_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
         private void pcBoxOpenStego_Click(object sender, EventArgs e)
         {
-            ofd.FileName = "";
-            ofd.Filter = "File Gambar(*.jpg;*.jpeg;*.png,*.bmp)|*.jpg;*.jpeg;*.png;*.bmp";
-            if (ofd.ShowDialog() == DialogResult.OK)
+            try
             {
-                pcBoxExtractStegoImage.Image = new Bitmap(ofd.FileName);
+                ofd.FileName = "";
+                ofd.Filter = "File Gambar(*.pgm;*.png;*.bmp;*.jpg;*.jpeg)|*.pgm;*.png;*.bmp;*.jpg;*.jpeg";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    string extension = Path.GetExtension(ofd.FileName);
+                    extension = extension.ToLower();
 
-                if (txtBoxKey.Text != "" && pcBoxExtractStegoImage.Image != null)
-                    btnExtract.Enabled = true;
-            } 
+                    if (extension == ".pgm")
+                    {
+                        PGMImageIO pgmImageIO = new PGMImageIO(ofd.FileName);
+                        pgmImageIO.LoadImage();
+                        Bitmap _image = new Bitmap(pgmImageIO.Image);
+                        pcBoxExtractStegoImage.Image = _image;
+                    }
+                    else
+                        pcBoxExtractStegoImage.Image = new Bitmap(ofd.FileName);
+
+                    if (txtBoxKey.Text != "" && pcBoxExtractStegoImage.Image != null)
+                        btnExtract.Enabled = true;
+                }
+            }
+            catch (Exception er)
+            {
+                MessageBox.Show("Failed to load image : \n" + er.Message);
+            }
         }
 
         private void btnExtract_Click(object sender, EventArgs e)
-        {            
-            Bitmap stegoImage = new Bitmap(pcBoxExtractStegoImage.Image);            
-            int p = Convert.ToInt32(txtBoxKey.Text);
-            Extract extract = new Extract();
-            string extractedMessage = extract.Extraction(stegoImage, p);
-            txtBoxExtractMessage.Text = extractedMessage;
+        {
+            try
+            {
+                Bitmap stegoImage = new Bitmap(pcBoxExtractStegoImage.Image);
+                int p = Convert.ToInt32(txtBoxKey.Text);
+                Extract extract = new Extract();
+                string extractedMessage = extract.Extraction(stegoImage, p);
+                txtBoxExtractMessage.Text = extractedMessage;
+            }
+            catch (Exception er)
+            {
+                MessageBox.Show("Failed to extract secret message from stego image : \n" + er.Message);
+            }
         }
 
         private void btnResetExtract_Click(object sender, EventArgs e)

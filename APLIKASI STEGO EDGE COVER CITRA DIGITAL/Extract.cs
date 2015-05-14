@@ -33,7 +33,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             }
 
             //pixels in eMax are maximum number of edge pixels for a given image
-            Canny CannyDataMax = new Canny(mask, 0.1F, 0F);
+            Canny CannyDataMax = new Canny(mask, 0.1F, 0F, 0.1F);
             Bitmap eMax = new Bitmap(CannyDataMax.DisplayImage(CannyDataMax.EdgeMap));
 
             //shuffle e and stegoImage using stego key P to embed tH and WoG in non-edge pixels of stegoImage
@@ -48,6 +48,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             int index = 0;
             bool ex = false;
             string binaryTh = "";
+            string binaryWoG = "";
             for (int i = 0; i < eMax.Height; i++)
             {
                 for (int j = 0; j < eMax.Width; j++)
@@ -66,6 +67,7 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
                         {
                             byte x = (byte)((stegoImage.GetPixel(j, i).R + stegoImage.GetPixel(j, i).G + stegoImage.GetPixel(j, i).B) / 3);
                             byte value = (byte)(x & 1);
+                            binaryWoG += (value % 2).ToString();
                             index++;
                         }
                     }
@@ -82,14 +84,16 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
 
             //reshuffle back stegoImage
             stegoImage = permuteStegoImage.Process(stegoImage, "Decrypt");
-
+            
             //convert threshold and width of Gaussian from the IEEE 754 floating point half precision format to float
             ushort halfTh = Convert.ToUInt16(binaryTh, 2);
-            float tH = Half.HalfToFloat(halfTh);
+            float tH = (float)Math.Round(Half.HalfToFloat(halfTh),0);
             float tL = 0.4F * tH;
+            ushort halfWoG = Convert.ToUInt16(binaryWoG, 2);
+            float WoG = (float)Math.Round(Half.HalfToFloat(halfWoG),1);
 
             //obtain e: e is edge map obtained by calling canny edge detection algorithm
-            Canny CannyData = new Canny(mask, tH, tL);
+            Canny CannyData = new Canny(mask, tH, tL, WoG);
             Bitmap e = CannyData.DisplayImage(CannyData.EdgeMap);
 
             //shuffle stegoImage to get order of embedding
@@ -116,8 +120,9 @@ namespace APLIKASI_STEGO_EDGE_COVER_CITRA_DIGITAL
             //end extract message
 
             //compute the value of c by the number of edges in mask
+            //edge - (edge * 0.1) because the number of the detected edge are in the range of the limit 0.1 and divided by 4 because about 1/4 of the edges are hold the length of the message in binary
             int edge = CannyData.CountEdges();
-            string binaryC = Convert.ToString((int)((edge - (edge * 0.1F)) / 4F), 2);
+            string binaryC = Convert.ToString((int)((edge - (edge * 0.1F)) / 4F), 2); 
             int C = (int)Math.Ceiling(binaryC.Length / 8F);
 
             //extract first c bits to get length of the message
